@@ -1,0 +1,4 @@
+1 LDA 80
+2 ADD 81
+3 STA 82
+4 HLT
