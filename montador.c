@@ -1,16 +1,16 @@
-#include <stdio.h> // Para operações de arquivo (fopen, fclose, fputc, etc.)
-#include <stdlib.h> // Para exit()
-#include <string.h> // Para manipulação de strings (strcmp, strtok, etc.)
+#include <stdio.h> 
+#include <stdlib.h> 
+#include <string.h> 
 
-// 1. Definição da tabela de opcodes e suas equivalências em Assembly
-// Você pode usar uma estrutura ou arrays paralelos para isso.
-// Exemplo simplificado:
+// Olá professor! esse trabalho foi feito por mim Hugo Gabriel Alves Franco Moreira - SP 3217566 e com o Lincoln - Sp319986X
+
+
 typedef struct {
-    char assembly_mnemonic[5]; // NOP, STA, LDA, etc.
-    char opcode_hex[3];       // 00, 10, 20, etc.
+    char assembly_mnemonic[5]; // <-- char de mnemônico
+    char opcode_hex[3];       // <-- char de OPCODE
 } OpcodeEntry;
 
-// Tabela global ou carregada de algum lugar
+// Tabela global de mnemonicos
 OpcodeEntry opcode_table[] = {
     {"NOP", "00"},
     {"STA", "10"},
@@ -34,10 +34,10 @@ char* get_opcode_hex(char* mnemonic) {
             return opcode_table[i].opcode_hex;
         }
     }
-    return NULL; // Mnemônico não encontrado
+    return NULL; // caso nao encontre mnemonicos
 }
 
-// Função para converter uma string hexadecimal para um byte (unsigned char)
+
 unsigned char hex_to_byte(char* hex_str) {
     unsigned int val;
     sscanf(hex_str, "%x", &val);
@@ -47,38 +47,37 @@ unsigned char hex_to_byte(char* hex_str) {
 int main(int argc, char *argv[]) {
     FILE *input_file;
     FILE *output_file;
-    char line[256]; // Buffer para ler cada linha do arquivo de entrada
+    char line[256];
     char *token;
     char *opcode_str;
     char *operand_str;
     unsigned char opcode_byte;
     unsigned char operand_byte;
 
-    // 2. Verificação dos argumentos da linha de comando
+
     if (argc != 2) {
         printf("Uso: %s <nome_do_arquivo_assembly.asm>\n", argv[0]);
         return 1;
     }
 
-    // 3. Abrir o arquivo .asm de entrada para leitura
+
     input_file = fopen(argv[1], "r");
     if (input_file == NULL) {
         perror("Erro ao abrir o arquivo de entrada");
         return 1;
     }
 
-    // 4. Criar o nome do arquivo .mem de saída
-    char output_filename[260]; // Considerando um nome de arquivo razoável + extensão
-    strcpy(output_filename, argv[1]);
-    // Encontrar o último ponto e substituir a extensão
-    char *dot = strrchr(output_filename, '.');
+    char output_filename[260]; // <-- delimitador de 260 caracteres no arquivo asm 
+    strcpy(output_filename, argv[1]); 
+    
+    char *dot = strrchr(output_filename, '.'); // função transformando o arquivo em .mem
     if (dot != NULL) {
         strcpy(dot, ".mem");
-    } else { // Se não houver ponto na extensão, apenas adiciona .mem
-        strcat(output_filename, ".mem");
+    } else { 
+        strcat(output_filename, ".mem"); 
     }
 
-    // 5. Abrir o arquivo .mem de saída para escrita (binário)
+    
     output_file = fopen(output_filename, "wb"); // "wb" para escrita binária
     if (output_file == NULL) {
         perror("Erro ao criar o arquivo de saída");
@@ -86,29 +85,26 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    // 6. Escrever o cabeçalho no arquivo .mem 
+   
     unsigned char header[] = {0x03, 0x4E, 0x44, 0x52};
     fwrite(header, sizeof(unsigned char), 4, output_file);
 
-    // 7. Loop de leitura do arquivo .asm e tradução
+    // Loop de leitura do arquivo .asm e tradução
     while (fgets(line, sizeof(line), input_file) != NULL) {
-        // Remover quebras de linha ou outros caracteres indesejados
+       
         line[strcspn(line, "\n\r")] = 0;
-
-        // Ignorar linhas em branco ou comentários (se houver)
-
-        // Quebrar a linha em tokens (número da linha, mnemônico, operando)
+     
         // Ex: "1 LDA 80" -> "1", "LDA", "80"
         token = strtok(line, " \t"); // Pega o número da linha (pode ser ignorado)
-        if (token == NULL) continue; // Linha vazia ou com apenas espaços
+        if (token == NULL) continue; // linha vazia ou com apenas espaços
 
-        token = strtok(NULL, " \t"); // Pega o mnemônico (ex: "LDA")
-        if (token == NULL) continue; // Mnemônico ausente
+        token = strtok(NULL, " \t"); // Pega o mnemonico (ex: "LDA")
+        if (token == NULL) continue; // Mnemonico ausente
 
         opcode_str = get_opcode_hex(token); // Busca o opcode em hexadecimal
         if (opcode_str == NULL) {
-            fprintf(stderr, "Erro: Mnemônico desconhecido: %s na linha %s\n", token, line);
-            // Você pode optar por sair ou pular a linha
+            fprintf(stderr, "Erro: Mnemônico desconhecido: %s na linha %s\n", token, line); // 
+            
             continue;
         }
 
